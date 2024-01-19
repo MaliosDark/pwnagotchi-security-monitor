@@ -7,12 +7,12 @@ from scapy.all import ARP, Ether, srp
 
 import pwnagotchi.plugins as plugins
 from pwnagotchi.ui.components import LabeledValue
-from pwnagotchi.ui.views import BLACK
+from pwnagotchi.ui.view import BLACK  # Corregido aquí
 import pwnagotchi.ui.fonts as fonts
 
 class SecurityPlugin(plugins.Plugin):
     __author__ = 'Your name'
-    __version__ = '1.8.1'
+    __version__ = '1.8.2'
     __license__ = 'GPL3'
     __description__ = 'Comprehensive security plugin for pwnagotchi.'
 
@@ -211,4 +211,5 @@ class SecurityPlugin(plugins.Plugin):
             self.ethernet_scan_interval = int(value)
         except ValueError:
             logging.warning("Invalid Ethernet scan interval value. Please enter a valid integer.")
+
 
