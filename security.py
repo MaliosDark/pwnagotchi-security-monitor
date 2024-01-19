@@ -12,7 +12,7 @@ import pwnagotchi.ui.fonts as fonts
 
 class SecurityPlugin(plugins.Plugin):
     __author__ = 'MaliosDark'
-    __version__ = '1.8.9'
+    __version__ = '1.9.0'
     __license__ = 'GPL3'
     __description__ = 'Comprehensive security plugin for pwnagotchi.'
 
@@ -35,18 +35,20 @@ class SecurityPlugin(plugins.Plugin):
         if not self.is_scapy_installed:
             self.install_scapy()
 
-        # Start a thread to monitor the network
+       # Start a thread to monitor the network
         monitoring_thread = threading.Thread(target=self.monitor_network, args=(ui,))
         monitoring_thread.start()
-
+        logging.debug("Monitoring thread started.")
 
         # Start a thread for Ethernet scanning
         ethernet_scan_thread = threading.Thread(target=self.ethernet_scan)
         ethernet_scan_thread.start()
+        logging.debug("Ethernet scan thread started.")
 
         # Start a separate thread for UI updates
         ui_update_thread = threading.Thread(target=self.ui_update_handler)
         ui_update_thread.start()
+        logging.debug("UI update thread started.")
 
         # Reboot the pwnagotchi to apply changes
         os.system("pwnagotchi rebootsys")
@@ -123,6 +125,7 @@ class SecurityPlugin(plugins.Plugin):
         os.system("pwnagotchi plug scapy --install")
 
     def monitor_network(self, ui):
+        logging.debug("Monitoring thread is running.")
         while True:
             try:
                 # Network monitoring logic
@@ -229,6 +232,7 @@ class SecurityPlugin(plugins.Plugin):
         return not self.detect_pwnagotchi_nearby()
 
     def ethernet_scan(self):
+        logging.debug("Ethernet scan thread is running.")
         while True:
             try:
                 result = subprocess.check_output(["arp-scan", "--localnet"], universal_newlines=True)
@@ -241,12 +245,12 @@ class SecurityPlugin(plugins.Plugin):
 
             time.sleep(self.ethernet_scan_interval)
 
-
     def show_ethernet_scan_results(self):
         # Log the Ethernet scan results
         logging.info(self.ethernet_scan_results)
 
     def ui_update_handler(self):
+        logging.debug("UI update thread is running.")
         while True:
             # Update UI elements with additional information
             ui.set('security_actions', f'Security Actions: {", ".join(self.security_action_options)}')
