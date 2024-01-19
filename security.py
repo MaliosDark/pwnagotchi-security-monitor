@@ -12,7 +12,7 @@ import pwnagotchi.ui.fonts as fonts
 
 class SecurityPlugin(plugins.Plugin):
     __author__ = 'MaliosDark'
-    __version__ = '1.8.4'
+    __version__ = '1.8.5'
     __license__ = 'GPL3'
     __description__ = 'Comprehensive security plugin for pwnagotchi.'
 
@@ -131,6 +131,7 @@ class SecurityPlugin(plugins.Plugin):
                 self.take_security_actions(ui)
 
             time.sleep(self.monitoring_interval)  # Monitoring interval
+
 
 
     def detect_pwnagotchi_nearby(self):
