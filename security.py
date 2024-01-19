@@ -12,7 +12,7 @@ import pwnagotchi.ui.fonts as fonts
 
 class SecurityPlugin(plugins.Plugin):
     __author__ = 'MaliosDark'
-    __version__ = '1.9.0'
+    __version__ = '1.9.1'
     __license__ = 'GPL3'
     __description__ = 'Comprehensive security plugin for pwnagotchi.'
 
@@ -28,14 +28,14 @@ class SecurityPlugin(plugins.Plugin):
         self.ethernet_scan_interval = 300  # Default Ethernet scan interval in seconds
 
     def on_loaded(self):
-        logging.info("Security plugin loaded")
+        logging.debug("Security plugin loaded")
         logging.basicConfig(level=logging.DEBUG)
 
         # Check and install scapy if needed
         if not self.is_scapy_installed:
             self.install_scapy()
 
-       # Start a thread to monitor the network
+        # Start a thread to monitor the network
         monitoring_thread = threading.Thread(target=self.monitor_network, args=(ui,))
         monitoring_thread.start()
         logging.debug("Monitoring thread started.")
@@ -50,8 +50,6 @@ class SecurityPlugin(plugins.Plugin):
         ui_update_thread.start()
         logging.debug("UI update thread started.")
 
-        # Reboot the pwnagotchi to apply changes
-        os.system("pwnagotchi rebootsys")
 
     def on_ui_setup(self, ui):
         # Add custom UI elements
