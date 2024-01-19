@@ -12,7 +12,7 @@ import pwnagotchi.ui.fonts as fonts
 
 class SecurityPlugin(plugins.Plugin):
     __author__ = 'MaliosDark'
-    __version__ = '1.8.6'
+    __version__ = '1.8.7'
     __license__ = 'GPL3'
     __description__ = 'Comprehensive security plugin for pwnagotchi.'
 
@@ -98,6 +98,9 @@ class SecurityPlugin(plugins.Plugin):
                                                                     label_font=fonts.Medium,
                                                                     text_font=fonts.Medium,
                                                                     on_change=self.update_ethernet_scan_interval))
+        
+        # Subscribe to UI updates for detected pwnagotchi and security actions
+        ui.subscribe(self, 'detected_pwnagotchi', 'security_actions')
 
     def on_ui_update(self, ui):
         # Update UI elements
@@ -135,14 +138,24 @@ class SecurityPlugin(plugins.Plugin):
 
 
     def detect_pwnagotchi_nearby(self):
-        # Logic for detecting nearby pwnagotchi
-        # Use ARP requests to find devices on the network
-        request = ARP(pdst=self.target_ip)
-        response, _ = srp(Ether(dst="ff:ff:ff:ff:ff:ff") / request, timeout=2, verbose=0)
+        try:
+            # Use ARP requests to find devices on the network
+            target_ip = self.target_ip
+            request = ARP(pdst=target_ip)
+            response, _ = srp(Ether(dst="ff:ff:ff:ff:ff:ff") / request, timeout=2, verbose=0)
 
-        if response:
-            return True
-        else:
+            # Check if there is any response
+            if response:
+                # Check if any of the responses is from a Pwnagotchi device
+                for _, received in response:
+                    if "Pwnagotchi" in received.hwsrc:
+                        return True
+
+            # No Pwnagotchi devices detected
+            return False
+
+        except Exception as e:
+            logging.error(f"Error detecting Pwnagotchi nearby: {e}")
             return False
 
     def display_detected_pwnagotchi(self, ui, detected_pwnagotchi):
@@ -162,18 +175,46 @@ class SecurityPlugin(plugins.Plugin):
             pass
         logging.debug(f'Took security actions: {self.selected_security_action}')
 
+        # Add this line to check the selected security action
+        logging.debug(f'Selected security action: {self.selected_security_action}')
+
 
     def change_wifi_channel(self):
         # Logic for changing Wi-Fi channel
-        # You can use pwnagotchi's API to execute bettercap commands
-        os.system("pwnagotchi bettercap 'ble.recon on'")
+        try:
+            # Use pwnagotchi's API to execute bettercap commands
+            command = "ble.recon on"
+            self.execute_bettercap_command(command)
 
-    def alert_user(self):
+            # Log the success
+            logging.debug("Changed Wi-Fi channel successfully.")
+        except Exception as e:
+            # Handle any errors that may occur during the channel change
+            logging.error(f"Error changing Wi-Fi channel: {e}")
+
+    def execute_bettercap_command(self, command):
+        # Execute a bettercap command using pwnagotchi's API
+        try:
+            os.system(f"pwnagotchi bettercap '{command}'")
+        except Exception as e:
+            logging.error(f"Error executing bettercap command: {e}")
+
+    def alert_user(self, ui):
         # Logic for alerting the user
-        # You can use pwnagotchi's API to display a message on the screen
-        ui.set('security_status', "Alert")
-        ui.set('security_actions', f'Security Actions: Alert - Detected Pwnagotchi!')
-        os.system("pwnagotchi display 'Alert: Detected Pwnagotchi!'")
+        try:
+            # Set UI elements
+            ui.set('security_status', "Alert")
+            ui.set('security_actions', f'Security Actions: Alert - Detected Pwnagotchi!')
+
+            # Display message on the screen
+            os.system("pwnagotchi display 'Alert: Detected Pwnagotchi!'")
+
+            # Log the alert
+            logging.debug("Alerted user about detected Pwnagotchi.")
+        except Exception as e:
+            # Handle any errors that may occur during the alert process
+            logging.error(f"Error alerting user: {e}")
+
 
     def is_security_ok(self):
         # Logic to determine if security is okay
@@ -187,11 +228,13 @@ class SecurityPlugin(plugins.Plugin):
                 # Use subprocess to execute the "arp-scan" command
                 result = subprocess.check_output(["arp-scan", "--localnet"], universal_newlines=True)
                 self.ethernet_scan_results = result
+                logging.debug("Ethernet scan successful.")
             except Exception as e:
                 logging.error(f"Error during Ethernet scan: {e}")
                 self.ethernet_scan_results = "Error during scan."
 
             time.sleep(self.ethernet_scan_interval)  # Scan interval
+
 
     def show_ethernet_scan_results(self):
         # Log the Ethernet scan results
