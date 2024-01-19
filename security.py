@@ -12,7 +12,7 @@ import pwnagotchi.ui.fonts as fonts
 
 class SecurityPlugin(plugins.Plugin):
     __author__ = 'MaliosDark'
-    __version__ = '1.8.5'
+    __version__ = '1.8.6'
     __license__ = 'GPL3'
     __description__ = 'Comprehensive security plugin for pwnagotchi.'
 
@@ -148,6 +148,7 @@ class SecurityPlugin(plugins.Plugin):
     def display_detected_pwnagotchi(self, ui, detected_pwnagotchi):
         # Display detected pwnagotchi information on the UI
         ui.set('detected_pwnagotchi', f'Detected Pwnagotchi: {detected_pwnagotchi}')
+        logging.debug(f'Displaying detected Pwnagotchi: {detected_pwnagotchi}')
 
     def take_security_actions(self, ui):
         # Take security actions based on the selected option
@@ -155,11 +156,11 @@ class SecurityPlugin(plugins.Plugin):
             self.change_wifi_channel()
         elif self.selected_security_action == "Alert User":
             self.alert_user(ui)
-        # Agregar más acciones de seguridad según sea necesario
+            logging.debug('Alerting user')
         elif self.selected_security_action == "Do Nothing":
             # Si la acción seleccionada es "Do Nothing", no hacemos nada.
             pass
-        # Add more security actions as needed
+        logging.debug(f'Took security actions: {self.selected_security_action}')
 
 
     def change_wifi_channel(self):
