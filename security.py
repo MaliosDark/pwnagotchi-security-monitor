@@ -7,12 +7,12 @@ from scapy.all import ARP, Ether, srp
 
 import pwnagotchi.plugins as plugins
 from pwnagotchi.ui.components import LabeledValue
-from pwnagotchi.ui.view import BLACK  # Corregido aquí
+from pwnagotchi.ui.view import BLACK  
 import pwnagotchi.ui.fonts as fonts
 
 class SecurityPlugin(plugins.Plugin):
     __author__ = 'MaliosDark'
-    __version__ = '1.8.7'
+    __version__ = '1.8.8'
     __license__ = 'GPL3'
     __description__ = 'Comprehensive security plugin for pwnagotchi.'
 
@@ -23,7 +23,7 @@ class SecurityPlugin(plugins.Plugin):
         self.selected_security_action = self.security_action_options[0]  # Default to changing Wi-Fi channel
         self.ethernet_scan_results = "No scan results yet"
         self.is_scapy_installed = self.check_scapy_installed()
-        self.target_ip = "192.168.1.1"  # Default target IP, can be edited through UI
+        self.target_ip = "192.168.68.1"  # Default target IP, can be edited through UI
         self.monitoring_interval = 10  # Default monitoring interval in seconds
         self.ethernet_scan_interval = 300  # Default Ethernet scan interval in seconds
 
@@ -101,10 +101,13 @@ class SecurityPlugin(plugins.Plugin):
         
         # Subscribe to UI updates for detected pwnagotchi and security actions
         ui.subscribe(self, 'detected_pwnagotchi', 'security_actions')
+        
 
     def on_ui_update(self, ui):
         # Update UI elements
         ui.set('security_status', "OK" if self.is_security_ok() else "Alert")
+        ui.update()
+
 
     def check_scapy_installed(self):
         try:
@@ -163,6 +166,9 @@ class SecurityPlugin(plugins.Plugin):
         ui.set('detected_pwnagotchi', f'Detected Pwnagotchi: {detected_pwnagotchi}')
         logging.debug(f'Displaying detected Pwnagotchi: {detected_pwnagotchi}')
 
+        # Llamada a ui.update para notificar a la UI sobre los cambios
+        ui.update()
+
     def take_security_actions(self, ui):
         # Take security actions based on the selected option
         if self.selected_security_action == "Change Wi-Fi Channel":
@@ -177,6 +183,9 @@ class SecurityPlugin(plugins.Plugin):
 
         # Add this line to check the selected security action
         logging.debug(f'Selected security action: {self.selected_security_action}')
+
+        # Llamada a ui.update para notificar a la UI sobre los cambios
+        ui.update()
 
 
     def change_wifi_channel(self):
