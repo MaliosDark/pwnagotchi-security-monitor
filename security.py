@@ -6,8 +6,8 @@ import os
 from scapy.all import ARP, Ether, srp
 
 import pwnagotchi.plugins as plugins
-from pwnagotchi.ui.components import LabeledValue, Button, TextInput
-from pwnagotchi.ui.view import BLACK, WHITE
+from pwnagotchi.ui.components import LabeledValue, TextInput
+from pwnagotchi.ui.views import BLACK, WHITE
 import pwnagotchi.ui.fonts as fonts
 
 class SecurityPlugin(plugins.Plugin):
@@ -68,8 +68,12 @@ class SecurityPlugin(plugins.Plugin):
                                                          text_font=fonts.Medium))
 
         # Add a button to access Ethernet scan results
-        ui.add_element('scan_button', Button(color=BLACK, position=(ui.width() / 2 - 25, 120), label='Scan Ethernet',
-                                             label_font=fonts.Medium, on_press=self.show_ethernet_scan_results))
+        ui.add_element('scan_button', LabeledValue(color=BLACK, label='Scan Ethernet',
+                                                    value='',
+                                                    position=(ui.width() / 2 - 25, 120),
+                                                    label_font=fonts.Medium,
+                                                    text_font=fonts.Medium,
+                                                    on_press=self.show_ethernet_scan_results))
 
         # Add a text input for configuring the target IP
         ui.add_element('target_ip_input', TextInput(color=BLACK, position=(10, 160), label='Target IP:',
@@ -202,4 +206,3 @@ class SecurityPlugin(plugins.Plugin):
             self.ethernet_scan_interval = int(value)
         except ValueError:
             logging.warning("Invalid Ethernet scan interval value. Please enter a valid integer.")
-
