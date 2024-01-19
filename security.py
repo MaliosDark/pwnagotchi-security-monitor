@@ -6,13 +6,13 @@ import os
 from scapy.all import ARP, Ether, srp
 
 import pwnagotchi.plugins as plugins
-from pwnagotchi.ui.components import LabeledValue, Drawable, Button, TextInput
+from pwnagotchi.ui.components import LabeledValue, Button, TextInput
 from pwnagotchi.ui.view import BLACK, WHITE
 import pwnagotchi.ui.fonts as fonts
 
 class SecurityPlugin(plugins.Plugin):
-    __author__ = 'MaliosDark'
-    __version__ = '1.6.0'
+    __author__ = 'Your name'
+    __version__ = '1.7.0'
     __license__ = 'GPL3'
     __description__ = 'Comprehensive security plugin for pwnagotchi.'
 
@@ -24,6 +24,8 @@ class SecurityPlugin(plugins.Plugin):
         self.ethernet_scan_results = "No scan results yet"
         self.is_scapy_installed = self.check_scapy_installed()
         self.target_ip = "192.168.1.1"  # Default target IP, can be edited through UI
+        self.monitoring_interval = 10  # Default monitoring interval in seconds
+        self.ethernet_scan_interval = 300  # Default Ethernet scan interval in seconds
 
     def on_loaded(self):
         logging.info("Security plugin loaded")
@@ -47,18 +49,23 @@ class SecurityPlugin(plugins.Plugin):
         # Reboot the pwnagotchi to apply changes
         os.system("pwnagotchi rebootsys")
 
-
     def on_ui_setup(self, ui):
         # Add custom UI elements
         ui.add_element('security_status', LabeledValue(color=BLACK, label='Security Status', value='OK',
                                                        position=(ui.width() / 2 - 50, 0), label_font=fonts.Bold,
                                                        text_font=fonts.Medium))
 
-        ui.add_element('detected_pwnagotchi', Drawable(color=BLACK, position=(10, 40), value='Detected Pwnagotchi:',
-                                                        font=fonts.Medium))
+        ui.add_element('detected_pwnagotchi', LabeledValue(color=BLACK, label='Detected Pwnagotchi:',
+                                                           value='',
+                                                           position=(10, 40),
+                                                           label_font=fonts.Medium,
+                                                           text_font=fonts.Medium))
 
-        ui.add_element('security_actions', Drawable(color=BLACK, position=(10, 80), value='Security Actions:',
-                                                    font=fonts.Medium))
+        ui.add_element('security_actions', LabeledValue(color=BLACK, label='Security Actions:',
+                                                         value='',
+                                                         position=(10, 80),
+                                                         label_font=fonts.Medium,
+                                                         text_font=fonts.Medium))
 
         # Add a button to access Ethernet scan results
         ui.add_element('scan_button', Button(color=BLACK, position=(ui.width() / 2 - 25, 120), label='Scan Ethernet',
@@ -68,6 +75,19 @@ class SecurityPlugin(plugins.Plugin):
         ui.add_element('target_ip_input', TextInput(color=BLACK, position=(10, 160), label='Target IP:',
                                                     initial_value=self.target_ip,
                                                     label_font=fonts.Medium, on_change=self.update_target_ip))
+
+        # Add text inputs for configuring monitoring and Ethernet scan intervals
+        ui.add_element('monitoring_interval_input', TextInput(color=BLACK, position=(10, 200),
+                                                              label='Monitoring Interval (s):',
+                                                              initial_value=str(self.monitoring_interval),
+                                                              label_font=fonts.Medium,
+                                                              on_change=self.update_monitoring_interval))
+
+        ui.add_element('ethernet_scan_interval_input', TextInput(color=BLACK, position=(10, 240),
+                                                                 label='Ethernet Scan Interval (s):',
+                                                                 initial_value=str(self.ethernet_scan_interval),
+                                                                 label_font=fonts.Medium,
+                                                                 on_change=self.update_ethernet_scan_interval))
 
     def on_ui_update(self, ui):
         # Update UI elements
@@ -100,7 +120,7 @@ class SecurityPlugin(plugins.Plugin):
                 # Take security actions based on the selected option
                 self.take_security_actions()
 
-            time.sleep(10)  # Monitoring interval
+            time.sleep(self.monitoring_interval)  # Monitoring interval
 
     def detect_pwnagotchi_nearby(self):
         # Logic for detecting nearby pwnagotchi
@@ -151,7 +171,7 @@ class SecurityPlugin(plugins.Plugin):
                 logging.error(f"Error during Ethernet scan: {e}")
                 self.ethernet_scan_results = "Error during scan."
 
-            time.sleep(300)  # Scan interval
+            time.sleep(self.ethernet_scan_interval)  # Scan interval
 
     def show_ethernet_scan_results(self):
         # Log the Ethernet scan results
@@ -168,4 +188,18 @@ class SecurityPlugin(plugins.Plugin):
     def update_target_ip(self, value):
         # Update the target IP based on the user input
         self.target_ip = value
+
+    def update_monitoring_interval(self, value):
+        # Update the monitoring interval based on the user input
+        try:
+            self.monitoring_interval = int(value)
+        except ValueError:
+            logging.warning("Invalid monitoring interval value. Please enter a valid integer.")
+
+    def update_ethernet_scan_interval(self, value):
+        # Update the Ethernet scan interval based on the user input
+        try:
+            self.ethernet_scan_interval = int(value)
+        except ValueError:
+            logging.warning("Invalid Ethernet scan interval value. Please enter a valid integer.")
 
