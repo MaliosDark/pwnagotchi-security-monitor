@@ -6,13 +6,13 @@ import os
 from scapy.all import ARP, Ether, srp
 
 import pwnagotchi.plugins as plugins
-from pwnagotchi.ui.components import LabeledValue, TextInput
-from pwnagotchi.ui.views import BLACK, WHITE
+from pwnagotchi.ui.components import LabeledValue
+from pwnagotchi.ui.views import BLACK
 import pwnagotchi.ui.fonts as fonts
 
 class SecurityPlugin(plugins.Plugin):
     __author__ = 'Your name'
-    __version__ = '1.8.0'
+    __version__ = '1.8.1'
     __license__ = 'GPL3'
     __description__ = 'Comprehensive security plugin for pwnagotchi.'
 
@@ -76,22 +76,27 @@ class SecurityPlugin(plugins.Plugin):
                                                     on_press=self.show_ethernet_scan_results))
 
         # Add a text input for configuring the target IP
-        ui.add_element('target_ip_input', TextInput(color=BLACK, position=(10, 160), label='Target IP:',
-                                                    initial_value=self.target_ip,
-                                                    label_font=fonts.Medium, on_change=self.update_target_ip))
+        ui.add_element('target_ip_input', LabeledValue(color=BLACK, label='Target IP:',
+                                                        value=str(self.target_ip),
+                                                        position=(10, 160),
+                                                        label_font=fonts.Medium,
+                                                        text_font=fonts.Medium,
+                                                        on_change=self.update_target_ip))
 
         # Add text inputs for configuring monitoring and Ethernet scan intervals
-        ui.add_element('monitoring_interval_input', TextInput(color=BLACK, position=(10, 200),
-                                                              label='Monitoring Interval (s):',
-                                                              initial_value=str(self.monitoring_interval),
-                                                              label_font=fonts.Medium,
-                                                              on_change=self.update_monitoring_interval))
-
-        ui.add_element('ethernet_scan_interval_input', TextInput(color=BLACK, position=(10, 240),
-                                                                 label='Ethernet Scan Interval (s):',
-                                                                 initial_value=str(self.ethernet_scan_interval),
+        ui.add_element('monitoring_interval_input', LabeledValue(color=BLACK, label='Monitoring Interval (s):',
+                                                                 value=str(self.monitoring_interval),
+                                                                 position=(10, 200),
                                                                  label_font=fonts.Medium,
-                                                                 on_change=self.update_ethernet_scan_interval))
+                                                                 text_font=fonts.Medium,
+                                                                 on_change=self.update_monitoring_interval))
+
+        ui.add_element('ethernet_scan_interval_input', LabeledValue(color=BLACK, label='Ethernet Scan Interval (s):',
+                                                                    value=str(self.ethernet_scan_interval),
+                                                                    position=(10, 240),
+                                                                    label_font=fonts.Medium,
+                                                                    text_font=fonts.Medium,
+                                                                    on_change=self.update_ethernet_scan_interval))
 
     def on_ui_update(self, ui):
         # Update UI elements
@@ -206,3 +211,4 @@ class SecurityPlugin(plugins.Plugin):
             self.ethernet_scan_interval = int(value)
         except ValueError:
             logging.warning("Invalid Ethernet scan interval value. Please enter a valid integer.")
+
