@@ -12,7 +12,7 @@ import pwnagotchi.ui.fonts as fonts
 
 class SecurityPlugin(plugins.Plugin):
     __author__ = 'MaliosDark'
-    __version__ = '1.9.1'
+    __version__ = '1.9.2'
     __license__ = 'GPL3'
     __description__ = 'Comprehensive security plugin for pwnagotchi.'
 
@@ -27,7 +27,7 @@ class SecurityPlugin(plugins.Plugin):
         self.monitoring_interval = 10  # Default monitoring interval in seconds
         self.ethernet_scan_interval = 300  # Default Ethernet scan interval in seconds
 
-    def on_loaded(self):
+    def on_loaded(self, ui):
         logging.debug("Security plugin loaded")
         logging.basicConfig(level=logging.DEBUG)
 
@@ -46,10 +46,9 @@ class SecurityPlugin(plugins.Plugin):
         logging.debug("Ethernet scan thread started.")
 
         # Start a separate thread for UI updates
-        ui_update_thread = threading.Thread(target=self.ui_update_handler)
+        ui_update_thread = threading.Thread(target=self.ui_update_handler, args=(ui,))
         ui_update_thread.start()
         logging.debug("UI update thread started.")
-
 
     def on_ui_setup(self, ui):
         # Add custom UI elements
@@ -133,6 +132,8 @@ class SecurityPlugin(plugins.Plugin):
                     self.detected_pwnagotchi_count += 1
                     self.display_detected_pwnagotchi(ui, detected_pwnagotchi)
                     self.take_security_actions(ui)
+                else:
+                    logging.warning("No Pwnagotchi detected. Sending error.")
 
                 time.sleep(self.monitoring_interval)
 
@@ -247,14 +248,19 @@ class SecurityPlugin(plugins.Plugin):
         # Log the Ethernet scan results
         logging.info(self.ethernet_scan_results)
 
-    def ui_update_handler(self):
+    def ui_update_handler(self, ui):
         logging.debug("UI update thread is running.")
         while True:
-            # Update UI elements with additional information
-            ui.set('security_actions', f'Security Actions: {", ".join(self.security_action_options)}')
-            ui.set('detected_pwnagotchi', f'Detected Pwnagotchi Count: {self.detected_pwnagotchi_count}')
-            ui.set('ethernet_scan_results', f'Ethernet Scan Results: {self.ethernet_scan_results}')
-            time.sleep(60)  # UI update interval
+            try:
+                # Update UI elements with additional information
+                ui.set('security_actions', f'Security Actions: {", ".join(self.security_action_options)}')
+                ui.set('detected_pwnagotchi', f'Detected Pwnagotchi Count: {self.detected_pwnagotchi_count}')
+                ui.set('ethernet_scan_results', f'Ethernet Scan Results: {self.ethernet_scan_results}')
+                ui.update()
+                time.sleep(60)  # UI update interval
+
+            except Exception as e:
+                logging.error(f"Error in UI update handler: {e}")
 
     def update_target_ip(self, value):
         # Update the target IP based on the user input
