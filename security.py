@@ -11,8 +11,8 @@ from pwnagotchi.ui.view import BLACK  # Corregido aquí
 import pwnagotchi.ui.fonts as fonts
 
 class SecurityPlugin(plugins.Plugin):
-    __author__ = 'Your name'
-    __version__ = '1.8.2'
+    __author__ = 'MaliosDark'
+    __version__ = '1.8.3'
     __license__ = 'GPL3'
     __description__ = 'Comprehensive security plugin for pwnagotchi.'
 
@@ -120,11 +120,11 @@ class SecurityPlugin(plugins.Plugin):
             detected_pwnagotchi = self.detect_pwnagotchi_nearby()
 
             if detected_pwnagotchi:
-                # Display detected pwnagotchi information on the UI
-                self.display_detected_pwnagotchi(ui, detected_pwnagotchi)
-
                 # Increment the detected pwnagotchi count
                 self.detected_pwnagotchi_count += 1
+
+                # Display detected pwnagotchi information on the UI
+                self.display_detected_pwnagotchi(ui, detected_pwnagotchi)
 
                 # Take security actions based on the selected option
                 self.take_security_actions()
@@ -152,6 +152,10 @@ class SecurityPlugin(plugins.Plugin):
             self.change_wifi_channel()
         elif self.selected_security_action == "Alert User":
             self.alert_user()
+        # Agregar más acciones de seguridad según sea necesario
+        elif self.selected_security_action == "Do Nothing":
+            # Si la acción seleccionada es "Do Nothing", no hacemos nada.
+            pass
         # Add more security actions as needed
 
     def change_wifi_channel(self):
@@ -162,6 +166,8 @@ class SecurityPlugin(plugins.Plugin):
     def alert_user(self):
         # Logic for alerting the user
         # You can use pwnagotchi's API to display a message on the screen
+        ui.set('security_status', "Alert")
+        ui.set('security_actions', f'Security Actions: Alert - Detected Pwnagotchi!')
         os.system("pwnagotchi display 'Alert: Detected Pwnagotchi!'")
 
     def is_security_ok(self):
