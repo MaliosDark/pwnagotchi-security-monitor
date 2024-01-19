@@ -12,7 +12,7 @@ import pwnagotchi.ui.fonts as fonts
 
 class SecurityPlugin(plugins.Plugin):
     __author__ = 'MaliosDark'
-    __version__ = '1.8.3'
+    __version__ = '1.8.4'
     __license__ = 'GPL3'
     __description__ = 'Comprehensive security plugin for pwnagotchi.'
 
@@ -35,8 +35,9 @@ class SecurityPlugin(plugins.Plugin):
             self.install_scapy()
 
         # Start a thread to monitor the network
-        monitoring_thread = threading.Thread(target=self.monitor_network)
+        monitoring_thread = threading.Thread(target=self.monitor_network, args=(ui,))
         monitoring_thread.start()
+
 
         # Start a thread for Ethernet scanning
         ethernet_scan_thread = threading.Thread(target=self.ethernet_scan)
@@ -114,7 +115,7 @@ class SecurityPlugin(plugins.Plugin):
         # Install scapy using pip
         os.system("pwnagotchi plug scapy --install")
 
-    def monitor_network(self):
+    def monitor_network(self, ui):
         while True:
             # Network monitoring logic
             detected_pwnagotchi = self.detect_pwnagotchi_nearby()
@@ -127,9 +128,10 @@ class SecurityPlugin(plugins.Plugin):
                 self.display_detected_pwnagotchi(ui, detected_pwnagotchi)
 
                 # Take security actions based on the selected option
-                self.take_security_actions()
+                self.take_security_actions(ui)
 
             time.sleep(self.monitoring_interval)  # Monitoring interval
+
 
     def detect_pwnagotchi_nearby(self):
         # Logic for detecting nearby pwnagotchi
@@ -146,17 +148,18 @@ class SecurityPlugin(plugins.Plugin):
         # Display detected pwnagotchi information on the UI
         ui.set('detected_pwnagotchi', f'Detected Pwnagotchi: {detected_pwnagotchi}')
 
-    def take_security_actions(self):
+    def take_security_actions(self, ui):
         # Take security actions based on the selected option
         if self.selected_security_action == "Change Wi-Fi Channel":
             self.change_wifi_channel()
         elif self.selected_security_action == "Alert User":
-            self.alert_user()
+            self.alert_user(ui)
         # Agregar más acciones de seguridad según sea necesario
         elif self.selected_security_action == "Do Nothing":
             # Si la acción seleccionada es "Do Nothing", no hacemos nada.
             pass
         # Add more security actions as needed
+
 
     def change_wifi_channel(self):
         # Logic for changing Wi-Fi channel
