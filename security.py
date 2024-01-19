@@ -12,7 +12,7 @@ import pwnagotchi.ui.fonts as fonts
 
 class SecurityPlugin(plugins.Plugin):
     __author__ = 'MaliosDark'
-    __version__ = '1.8.8'
+    __version__ = '1.8.9'
     __license__ = 'GPL3'
     __description__ = 'Comprehensive security plugin for pwnagotchi.'
 
@@ -29,6 +29,7 @@ class SecurityPlugin(plugins.Plugin):
 
     def on_loaded(self):
         logging.info("Security plugin loaded")
+        logging.basicConfig(level=logging.DEBUG)
 
         # Check and install scapy if needed
         if not self.is_scapy_installed:
@@ -123,22 +124,19 @@ class SecurityPlugin(plugins.Plugin):
 
     def monitor_network(self, ui):
         while True:
-            # Network monitoring logic
-            detected_pwnagotchi = self.detect_pwnagotchi_nearby()
+            try:
+                # Network monitoring logic
+                detected_pwnagotchi = self.detect_pwnagotchi_nearby()
 
-            if detected_pwnagotchi:
-                # Increment the detected pwnagotchi count
-                self.detected_pwnagotchi_count += 1
+                if detected_pwnagotchi:
+                    self.detected_pwnagotchi_count += 1
+                    self.display_detected_pwnagotchi(ui, detected_pwnagotchi)
+                    self.take_security_actions(ui)
 
-                # Display detected pwnagotchi information on the UI
-                self.display_detected_pwnagotchi(ui, detected_pwnagotchi)
+                time.sleep(self.monitoring_interval)
 
-                # Take security actions based on the selected option
-                self.take_security_actions(ui)
-
-            time.sleep(self.monitoring_interval)  # Monitoring interval
-
-
+            except Exception as e:
+                logging.error(f"Error in network monitoring: {e}")
 
     def detect_pwnagotchi_nearby(self):
         try:
@@ -170,22 +168,22 @@ class SecurityPlugin(plugins.Plugin):
         ui.update()
 
     def take_security_actions(self, ui):
-        # Take security actions based on the selected option
-        if self.selected_security_action == "Change Wi-Fi Channel":
-            self.change_wifi_channel()
-        elif self.selected_security_action == "Alert User":
-            self.alert_user(ui)
-            logging.debug('Alerting user')
-        elif self.selected_security_action == "Do Nothing":
-            # Si la acción seleccionada es "Do Nothing", no hacemos nada.
-            pass
-        logging.debug(f'Took security actions: {self.selected_security_action}')
+        try:
+            if self.selected_security_action == "Change Wi-Fi Channel":
+                self.change_wifi_channel()
+            elif self.selected_security_action == "Alert User":
+                self.alert_user(ui)
+            elif self.selected_security_action == "Do Nothing":
+                pass
 
-        # Add this line to check the selected security action
-        logging.debug(f'Selected security action: {self.selected_security_action}')
+            logging.debug(f'Took security actions: {self.selected_security_action}')
+            logging.debug(f'Selected security action: {self.selected_security_action}')
 
-        # Llamada a ui.update para notificar a la UI sobre los cambios
-        ui.update()
+            ui.update()
+
+        except Exception as e:
+            logging.error(f"Error in taking security actions: {e}")
+
 
 
     def change_wifi_channel(self):
@@ -232,17 +230,16 @@ class SecurityPlugin(plugins.Plugin):
 
     def ethernet_scan(self):
         while True:
-            # Logic for Ethernet scanning
             try:
-                # Use subprocess to execute the "arp-scan" command
                 result = subprocess.check_output(["arp-scan", "--localnet"], universal_newlines=True)
                 self.ethernet_scan_results = result
                 logging.debug("Ethernet scan successful.")
+
             except Exception as e:
                 logging.error(f"Error during Ethernet scan: {e}")
                 self.ethernet_scan_results = "Error during scan."
 
-            time.sleep(self.ethernet_scan_interval)  # Scan interval
+            time.sleep(self.ethernet_scan_interval)
 
 
     def show_ethernet_scan_results(self):
