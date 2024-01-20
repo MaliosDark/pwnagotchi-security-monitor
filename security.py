@@ -11,7 +11,7 @@ import pwnagotchi.ui.fonts as fonts
 
 class SecurityPlugin(plugins.Plugin):
     __author__ = 'MaliosDark'
-    __version__ = '1.9.4'
+    __version__ = '1.9.5'
     __license__ = 'GPL3'
     __description__ = 'Comprehensive security plugin for pwnagotchi.'
 
@@ -105,6 +105,8 @@ class SecurityPlugin(plugins.Plugin):
     def on_ui_update(self, ui):
         # Update UI elements
         ui.set('security_status', "OK" if self.is_security_ok() else "Alert")
+        ui.set('security_actions', f'Security Actions: {", ".join(self.security_action_options)}')
+        ui.set('detected_pwnagotchi', f'Detected Pwnagotchi Count: {self.detected_pwnagotchi_count}')
         ui.update()
 
 
@@ -124,14 +126,12 @@ class SecurityPlugin(plugins.Plugin):
         logging.debug("Monitoring thread is running.")
         while True:
             try:
-                # Network monitoring logic
                 detected_pwnagotchi = self.detect_pwnagotchi_nearby()
 
                 if detected_pwnagotchi:
                     self.display_detected_pwnagotchi(ui, detected_pwnagotchi)
                     self.take_security_actions(ui)
                 else:
-                    # Mostrar un mensaje temporal cuando no se detecta ningún Pwnagotchi
                     ui.set('detected_pwnagotchi', 'No Pwnagotchi detected yet...')
                     logging.debug('No Pwnagotchi detected yet...')
 
@@ -186,12 +186,10 @@ class SecurityPlugin(plugins.Plugin):
                 pass
 
             logging.debug(f'Took security actions: {self.selected_security_action}')
-            logging.debug(f'Selected security action: {self.selected_security_action}')
 
         except Exception as e:
             logging.error(f"Error in taking security actions: {e}")
 
-        # Mostrar un mensaje temporal en la interfaz de usuario mientras se espera la próxima actualización
         ui.set('security_actions', 'Updating security actions...')
         ui.update()
 
@@ -261,12 +259,9 @@ class SecurityPlugin(plugins.Plugin):
         logging.debug("UI update thread is running.")
         while True:
             try:
-                # Update UI elements with additional information
-                ui.set('security_actions', f'Security Actions: {", ".join(self.security_action_options)}')
-                ui.set('detected_pwnagotchi', f'Detected Pwnagotchi Count: {self.detected_pwnagotchi_count}')
                 ui.set('ethernet_scan_results', f'Ethernet Scan Results: {self.ethernet_scan_results}')
                 ui.update()
-                time.sleep(60)  # UI update interval
+                time.sleep(60)
 
             except Exception as e:
                 logging.error(f"Error in UI update handler: {e}")
