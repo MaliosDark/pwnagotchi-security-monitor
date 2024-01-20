@@ -12,7 +12,7 @@ import pwnagotchi.ui.fonts as fonts
 
 class SecurityPlugin(plugins.Plugin):
     __author__ = 'MaliosDark'
-    __version__ = '1.9.2'
+    __version__ = '1.9.3'
     __license__ = 'GPL3'
     __description__ = 'Comprehensive security plugin for pwnagotchi.'
 
@@ -162,12 +162,19 @@ class SecurityPlugin(plugins.Plugin):
             return False
 
     def display_detected_pwnagotchi(self, ui, detected_pwnagotchi):
-        # Display detected pwnagotchi information on the UI
-        ui.set('detected_pwnagotchi', f'Detected Pwnagotchi: {detected_pwnagotchi}')
-        logging.debug(f'Displaying detected Pwnagotchi: {detected_pwnagotchi}')
+        # Incrementar el contador solo si es un nuevo Pwnagotchi detectado
+        if detected_pwnagotchi:
+            self.detected_pwnagotchi_count += 1
+            ui.set('detected_pwnagotchi', f'Detected Pwnagotchi Count: {self.detected_pwnagotchi_count}')
+            logging.debug(f'Displaying detected Pwnagotchi: {detected_pwnagotchi}')
+        else:
+            # Mostrar un mensaje temporal cuando no se detecta ningún Pwnagotchi
+            ui.set('detected_pwnagotchi', 'No Pwnagotchi detected yet...')
+            logging.debug('No Pwnagotchi detected yet...')
 
         # Llamada a ui.update para notificar a la UI sobre los cambios
         ui.update()
+
 
     def take_security_actions(self, ui):
         try:
@@ -181,10 +188,12 @@ class SecurityPlugin(plugins.Plugin):
             logging.debug(f'Took security actions: {self.selected_security_action}')
             logging.debug(f'Selected security action: {self.selected_security_action}')
 
-            ui.update()
-
         except Exception as e:
             logging.error(f"Error in taking security actions: {e}")
+
+        # Mostrar un mensaje temporal en la interfaz de usuario mientras se espera la próxima actualización
+        ui.set('security_actions', 'Updating security actions...')
+        ui.update()
 
 
 
