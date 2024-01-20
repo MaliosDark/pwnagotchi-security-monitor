@@ -11,7 +11,7 @@ import pwnagotchi.ui.fonts as fonts
 
 class SecurityPlugin(plugins.Plugin):
     __author__ = 'MaliosDark'
-    __version__ = '1.9.6'
+    __version__ = '1.9.7'
     __license__ = 'GPL3'
     __description__ = 'Comprehensive security plugin for pwnagotchi.'
 
@@ -103,10 +103,9 @@ class SecurityPlugin(plugins.Plugin):
         
 
     def on_ui_update(self, ui):
-        # Update UI elements
         ui.set('security_status', "OK" if self.is_security_ok() else "Alert")
-        ui.set('security_actions', f': {", ".join(self.security_action_options)}')
-        ui.set('detected_pwnagotchi', f': {self.detected_pwnagotchi_count}')
+        ui.set('security_actions', f' : {self.selected_security_action}')
+        ui.set('detected_pwnagotchi', f' : {self.detected_pwnagotchi_count}')
         ui.update()
 
 
@@ -162,19 +161,28 @@ class SecurityPlugin(plugins.Plugin):
             return False
 
     def display_detected_pwnagotchi(self, ui, detected_pwnagotchi):
-        # Incrementar el contador solo si es un nuevo Pwnagotchi detectado
         if detected_pwnagotchi:
             self.detected_pwnagotchi_count += 1
-            ui.set('detected_pwnagotchi', f'Detected Pwnagotchi Count: {self.detected_pwnagotchi_count}')
-            logging.debug(f'Displaying detected Pwnagotchi: {detected_pwnagotchi}')
+            ui.set('detected_pwnagotchi', f' : {self.detected_pwnagotchi_count}')
+            logging.debug(f' : {detected_pwnagotchi}')
+
+            # Seleccionar una acción basada en la detección
+            self.select_security_action(detected_pwnagotchi)
+            self.take_security_actions(ui)
         else:
-            # Mostrar un mensaje temporal cuando no se detecta ningún Pwnagotchi
-            ui.set('detected_pwnagotchi', 'No Pwnagotchi detected yet...')
+            ui.set('detected_pwnagotchi', 'None detected yet...')
             logging.debug('No Pwnagotchi detected yet...')
 
-        # Llamada a ui.update para notificar a la UI sobre los cambios
         ui.update()
 
+    def select_security_action(self, detected_pwnagotchi):
+        # Lógica para seleccionar la acción de seguridad basada en la detección
+        if detected_pwnagotchi:
+            # Pwnagotchi detectado, seleccionar acción correspondiente
+            self.selected_security_action = "Alert User"
+        else:
+            # Ningún Pwnagotchi detectado, seleccionar acción por defecto
+            self.selected_security_action = "Change Wi-Fi Channel"
 
     def take_security_actions(self, ui):
         try:
@@ -190,7 +198,7 @@ class SecurityPlugin(plugins.Plugin):
         except Exception as e:
             logging.error(f"Error in taking security actions: {e}")
 
-        ui.set('security_actions', 'Updating security actions...')
+        ui.set('security_actions', f'Security Actions: {self.selected_security_action}')
         ui.update()
 
 
