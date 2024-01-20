@@ -4,7 +4,6 @@ import threading
 import subprocess
 import os
 from scapy.all import ARP, Ether, srp
-
 import pwnagotchi.plugins as plugins
 from pwnagotchi.ui.components import LabeledValue
 from pwnagotchi.ui.view import BLACK  
@@ -12,7 +11,7 @@ import pwnagotchi.ui.fonts as fonts
 
 class SecurityPlugin(plugins.Plugin):
     __author__ = 'MaliosDark'
-    __version__ = '1.9.3'
+    __version__ = '1.9.4'
     __license__ = 'GPL3'
     __description__ = 'Comprehensive security plugin for pwnagotchi.'
 
@@ -129,11 +128,12 @@ class SecurityPlugin(plugins.Plugin):
                 detected_pwnagotchi = self.detect_pwnagotchi_nearby()
 
                 if detected_pwnagotchi:
-                    self.detected_pwnagotchi_count += 1
                     self.display_detected_pwnagotchi(ui, detected_pwnagotchi)
                     self.take_security_actions(ui)
                 else:
-                    logging.warning("No Pwnagotchi detected. Sending error.")
+                    # Mostrar un mensaje temporal cuando no se detecta ningún Pwnagotchi
+                    ui.set('detected_pwnagotchi', 'No Pwnagotchi detected yet...')
+                    logging.debug('No Pwnagotchi detected yet...')
 
                 time.sleep(self.monitoring_interval)
 
