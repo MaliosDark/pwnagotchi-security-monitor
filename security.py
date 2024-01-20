@@ -11,7 +11,7 @@ import pwnagotchi.ui.fonts as fonts
 
 class SecurityPlugin(plugins.Plugin):
     __author__ = 'MaliosDark'
-    __version__ = '1.9.8'
+    __version__ = '1.9.9'
     __license__ = 'GPL3'
     __description__ = 'Comprehensive security plugin for pwnagotchi.'
 
@@ -158,28 +158,33 @@ class SecurityPlugin(plugins.Plugin):
                         return True
 
             # Use ARP requests to find devices on the network (Ethernet)
-            ethernet_result = subprocess.check_output(["arp-scan", "--localnet"], universal_newlines=True)
-            ethernet_detected_macs = [line.split()[1] for line in ethernet_result.splitlines()]
+            try:
+                ethernet_result = subprocess.check_output(["arp-scan", "--localnet"], universal_newlines=True)
+                ethernet_detected_macs = [line.split()[1] for line in ethernet_result.splitlines()]
 
-            # Log de direcciones MAC detectadas (puedes eliminar esto después de confirmar)
-            logging.debug(f"Detected MAC addresses (Wi-Fi): {detected_macs}")
-            logging.debug(f"Detected MAC addresses (Ethernet): {ethernet_detected_macs}")
+                # Log de direcciones MAC detectadas en Wi-Fi y Ethernet
+                logging.debug(f"Detected MAC addresses (Wi-Fi): {detected_macs}")
+                logging.debug(f"Detected MAC addresses (Ethernet): {ethernet_detected_macs}")
 
-            # Combina las direcciones MAC detectadas en ambas interfaces
-            all_detected_macs = set(detected_macs + ethernet_detected_macs)
+                # Combina las direcciones MAC detectadas en ambas interfaces
+                all_detected_macs = set(detected_macs + ethernet_detected_macs)
 
-            # Verifica si alguna dirección MAC pertenece a un dispositivo Pwnagotchi
-            for mac in all_detected_macs:
-                if "Pwnagotchi" in mac:
-                    return True
+                # Verifica si alguna dirección MAC pertenece a un dispositivo Pwnagotchi
+                for mac in all_detected_macs:
+                    if "Pwnagotchi" in mac:
+                        return True
+
+            except Exception as e_ethernet:
+                # Manejar errores en la detección de Ethernet
+                logging.error(f"Error during Ethernet scan: {e_ethernet}")
 
             # No Pwnagotchi devices detected
             return False
 
         except Exception as e:
+            # Manejar errores en la detección de Wi-Fi
             logging.error(f"Error detecting Pwnagotchi nearby: {e}")
             return False
-
     def display_detected_pwnagotchi(self, ui, detected_pwnagotchi):
         if detected_pwnagotchi:
             self.detected_pwnagotchi_count += 1
