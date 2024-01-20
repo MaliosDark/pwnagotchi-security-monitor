@@ -11,7 +11,7 @@ import pwnagotchi.ui.fonts as fonts
 
 class SecurityPlugin(plugins.Plugin):
     __author__ = 'MaliosDark'
-    __version__ = '1.9.7'
+    __version__ = '1.9.8'
     __license__ = 'GPL3'
     __description__ = 'Comprehensive security plugin for pwnagotchi.'
 
@@ -141,17 +141,37 @@ class SecurityPlugin(plugins.Plugin):
 
     def detect_pwnagotchi_nearby(self):
         try:
-            # Use ARP requests to find devices on the network
-            target_ip = self.target_ip
-            request = ARP(pdst=target_ip)
-            response, _ = srp(Ether(dst="ff:ff:ff:ff:ff:ff") / request, timeout=2, verbose=0)
+            # Use ARP requests to find devices on the network (Wi-Fi)
+            wifi_target_ip = self.target_ip
+            wifi_request = ARP(pdst=wifi_target_ip)
+            wifi_response, _ = srp(Ether(dst="ff:ff:ff:ff:ff:ff") / wifi_request, timeout=2, verbose=0)
 
-            # Check if there is any response
-            if response:
+            # Lista para almacenar direcciones MAC detectadas
+            detected_macs = []
+
+            # Check if there is any response in Wi-Fi
+            if wifi_response:
                 # Check if any of the responses is from a Pwnagotchi device
-                for _, received in response:
+                for _, received in wifi_response:
+                    detected_macs.append(received.hwsrc)
                     if "Pwnagotchi" in received.hwsrc:
                         return True
+
+            # Use ARP requests to find devices on the network (Ethernet)
+            ethernet_result = subprocess.check_output(["arp-scan", "--localnet"], universal_newlines=True)
+            ethernet_detected_macs = [line.split()[1] for line in ethernet_result.splitlines()]
+
+            # Log de direcciones MAC detectadas (puedes eliminar esto después de confirmar)
+            logging.debug(f"Detected MAC addresses (Wi-Fi): {detected_macs}")
+            logging.debug(f"Detected MAC addresses (Ethernet): {ethernet_detected_macs}")
+
+            # Combina las direcciones MAC detectadas en ambas interfaces
+            all_detected_macs = set(detected_macs + ethernet_detected_macs)
+
+            # Verifica si alguna dirección MAC pertenece a un dispositivo Pwnagotchi
+            for mac in all_detected_macs:
+                if "Pwnagotchi" in mac:
+                    return True
 
             # No Pwnagotchi devices detected
             return False
