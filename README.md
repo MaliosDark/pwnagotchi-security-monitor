@@ -50,5 +50,3 @@ Feel free to contribute to the project by submitting issues, feature requests, o
 
 Happy Pwnagotchi hacking!
 ```
-
-¡Espero que encuentres este README atractivo y útil, mi amor! 😊💕
