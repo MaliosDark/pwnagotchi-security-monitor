@@ -12,7 +12,7 @@ import pwnagotchi.ui.fonts as fonts
 
 class SecurityPlugin(plugins.Plugin):
     __author__ = 'MaliosDark'
-    __version__ = '1.9.92'
+    __version__ = '1.9.93'
     __license__ = 'GPL3'
     __description__ = 'The Security Plugin for Pwnagotchi is a comprehensive tool designed to enhance network monitoring and security capabilities on the Pwnagotchi platform. With a focus on simplicity and effectiveness, this plugin provides real-time insights into the network environment, allowing users to take proactive security measures.'
 
@@ -287,14 +287,21 @@ class SecurityPlugin(plugins.Plugin):
         while True:
             try:
                 result = subprocess.check_output(["arp-scan", "--localnet"], universal_newlines=True)
-                self.ethernet_scan_results = result
-                logging.debug("Ethernet scan successful.")
-
+                lines = result.split('\n')
+                if lines:
+                    self.ethernet_scan_results = result
+                    logging.debug("Ethernet scan successful.")
+                else:
+                    logging.warning("No results obtained during Ethernet scan.")
+            except subprocess.CalledProcessError as e:
+                logging.error(f"Error during Ethernet scan (CalledProcessError): {e}")
+                self.ethernet_scan_results = "Error during scan."
             except Exception as e:
                 logging.error(f"Error during Ethernet scan: {e}")
                 self.ethernet_scan_results = "Error during scan."
 
             time.sleep(self.ethernet_scan_interval)
+
 
     def show_ethernet_scan_results(self):
         # Log the Ethernet scan results
