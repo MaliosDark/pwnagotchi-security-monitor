@@ -4,6 +4,7 @@ import threading
 import subprocess
 import os
 from scapy.all import ARP, Ether, srp
+from flask import Flask, render_template_string
 import pwnagotchi.plugins as plugins
 from pwnagotchi.ui.components import LabeledValue
 from pwnagotchi.ui.view import BLACK  
@@ -11,20 +12,31 @@ import pwnagotchi.ui.fonts as fonts
 
 class SecurityPlugin(plugins.Plugin):
     __author__ = 'MaliosDark'
-    __version__ = '1.9.9'
+    __version__ = '1.9.91'
     __license__ = 'GPL3'
     __description__ = 'Comprehensive security plugin for pwnagotchi.'
 
     def __init__(self):
         logging.debug("Security plugin created")
         self.detected_pwnagotchi_count = 0
-        self.security_action_options = ["Change Wi-Fi Channel", "Alert User", "Do Nothing"]
+        self.security_action_options = ["Do Nothing", "Alert User", "Change Wi-Fi Channel"]
         self.selected_security_action = self.security_action_options[0]  # Default to changing Wi-Fi channel
         self.ethernet_scan_results = "No scan results yet"
         self.is_scapy_installed = self.check_scapy_installed()
         self.target_ip = "192.168.68.1"  # Default target IP, can be edited through UI
         self.monitoring_interval = 10  # Default monitoring interval in seconds
         self.ethernet_scan_interval = 300  # Default Ethernet scan interval in seconds
+        self.app = Flask(__name__)
+        self.app.add_url_rule('/ethernet-scan-results', 'ethernet_scan_results', self.ethernet_scan_results_page)
+        self.web_thread = threading.Thread(target=self.run_web)
+        self.web_thread.start()
+
+    def run_web(self):
+        self.app.run(host='0.0.0.0', port=8888, debug=False)
+
+    def ethernet_scan_results_page(self):
+        return render_template_string('<pre>{{ results }}</pre>', results=self.ethernet_scan_results)
+
 
     def on_loaded(self, ui):
         logging.debug("Security plugin loaded")
@@ -61,7 +73,7 @@ class SecurityPlugin(plugins.Plugin):
                                                            label_font=fonts.Medium,
                                                            text_font=fonts.Medium))
 
-        ui.add_element('security_actions', LabeledValue(color=BLACK, label='Security Actions:',
+        ui.add_element('security_actions', LabeledValue(color=BLACK, label='Security Actions',
                                                          value='',
                                                          position=(10, 80),
                                                          label_font=fonts.Medium,
