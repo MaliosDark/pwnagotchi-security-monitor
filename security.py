@@ -11,7 +11,7 @@ import pwnagotchi.ui.fonts as fonts
 
 class SecurityPlugin(plugins.Plugin):
     __author__ = 'MaliosDark'
-    __version__ = '1.9.5'
+    __version__ = '1.9.6'
     __license__ = 'GPL3'
     __description__ = 'Comprehensive security plugin for pwnagotchi.'
 
@@ -105,8 +105,8 @@ class SecurityPlugin(plugins.Plugin):
     def on_ui_update(self, ui):
         # Update UI elements
         ui.set('security_status', "OK" if self.is_security_ok() else "Alert")
-        ui.set('security_actions', f'Security Actions: {", ".join(self.security_action_options)}')
-        ui.set('detected_pwnagotchi', f'Detected Pwnagotchi Count: {self.detected_pwnagotchi_count}')
+        ui.set('security_actions', f': {", ".join(self.security_action_options)}')
+        ui.set('detected_pwnagotchi', f': {self.detected_pwnagotchi_count}')
         ui.update()
 
 
