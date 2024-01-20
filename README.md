@@ -1,9 +1,10 @@
+
 ```markdown
-# Security Plugin for Pwnagotchi
+## Pwnagotchi Security Plugin
 
 ## Overview
 
-The Security Plugin for Pwnagotchi is a comprehensive tool designed to enhance network monitoring and security capabilities on the Pwnagotchi platform. With a focus on simplicity and effectiveness, this plugin provides real-time insights into the network environment, allowing users to take proactive security measures.
+The Pwnagotchi Security Plugin is a comprehensive tool designed to enhance network monitoring and security capabilities on the Pwnagotchi platform. With a focus on simplicity and effectiveness, this plugin provides real-time insights into the network environment, allowing users to take proactive security measures.
 
 ## Features
 
@@ -14,14 +15,30 @@ The Security Plugin for Pwnagotchi is a comprehensive tool designed to enhance n
 
 ## Installation
 
-1. Clone the repository or download the `security.py` file.
-2. Place the `security.py` file in the Pwnagotchi plugins directory.
+1. Install Flask using:
 
-```bash
-cp security.py /usr/local/share/pwnagotchi/installed-plugins/
-```
+   ```bash
+   pip3 install Flask
+   ```
 
-3. Configure the plugin by updating the target IP, monitoring interval, and other settings through the Pwnagotchi UI.
+2. Clone the repository or download the `security.py` file.
+3. Place the `security.py` file in the Pwnagotchi plugins directory.
+
+   ```bash
+   cp security.py /usr/local/share/pwnagotchi/installed-plugins/
+   ```
+
+4. Configure the plugin by updating the target IP, monitoring interval, and other settings through the Pwnagotchi UI.
+5. There are 3 Modes: ["Do Nothing", "Alert User", "Change Wi-Fi Channel"]
+6. Add into the `config.toml` file:
+
+   ```toml
+   main.plugins.security.enabled = true
+   main.plugins.security.target_ip = "192.168.68.1"
+   main.plugins.security.monitoring_interval = 10
+   main.plugins.security.ethernet_scan_interval = 300
+   main.plugins.security.selected_security_action = "Change Wi-Fi Channel"
+   ```
 
 ## Usage
 
