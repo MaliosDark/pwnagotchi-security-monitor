@@ -12,9 +12,9 @@ import pwnagotchi.ui.fonts as fonts
 
 class SecurityPlugin(plugins.Plugin):
     __author__ = 'MaliosDark'
-    __version__ = '1.9.91'
+    __version__ = '1.9.92'
     __license__ = 'GPL3'
-    __description__ = 'Comprehensive security plugin for pwnagotchi.'
+    __description__ = 'The Security Plugin for Pwnagotchi is a comprehensive tool designed to enhance network monitoring and security capabilities on the Pwnagotchi platform. With a focus on simplicity and effectiveness, this plugin provides real-time insights into the network environment, allowing users to take proactive security measures.'
 
     def __init__(self):
         logging.debug("Security plugin created")
@@ -73,7 +73,7 @@ class SecurityPlugin(plugins.Plugin):
                                                            label_font=fonts.Medium,
                                                            text_font=fonts.Medium))
 
-        ui.add_element('security_actions', LabeledValue(color=BLACK, label='Security Actions',
+        ui.add_element('security_actions', LabeledValue(color=BLACK, label='Security Actions:',
                                                          value='',
                                                          position=(10, 80),
                                                          label_font=fonts.Medium,
@@ -116,8 +116,8 @@ class SecurityPlugin(plugins.Plugin):
 
     def on_ui_update(self, ui):
         ui.set('security_status', "OK" if self.is_security_ok() else "Alert")
-        ui.set('security_actions', f' : {self.selected_security_action}')
-        ui.set('detected_pwnagotchi', f' : {self.detected_pwnagotchi_count}')
+        ui.set('security_actions', f'  {self.selected_security_action}')
+        ui.set('detected_pwnagotchi', f'  {self.detected_pwnagotchi_count}')
         ui.update()
 
 
