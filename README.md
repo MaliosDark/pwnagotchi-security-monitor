@@ -1,5 +1,5 @@
 
-```markdown
+
 ## Pwnagotchi Security Plugin
 
 ## Overview
@@ -14,10 +14,10 @@ The Pwnagotchi Security Plugin is a comprehensive tool designed to enhance netwo
 - **User-Friendly UI:** Integrates seamlessly with the Pwnagotchi UI, providing an intuitive interface for configuration and monitoring.
 
 ## Installation
-
+```markdown
 1. Install Flask using:
 
-   ```bash
+
    pip3 install Flask
    ```
 
